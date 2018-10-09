@@ -1,7 +1,9 @@
 <?php
-	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
+    if (!defined('__IN_SYMPHONY__')) {
+        die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
+    }
 
-	Class fieldImageCropper extends Field {
+    class fieldImageCropper extends Field{
 
 		const CROPPED = 0;
 		const WIDTH = 1;
@@ -156,7 +158,7 @@
 			return self::__OK__;
 		}
 
-		public function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL){
+		public function processRawFieldData($data, &$status, &$message = NULL, $simulate = false, $entry_id = NULL){
 			$status = self::__OK__;
 			$result = array(
 				'cropped' => $data['cropped'],
@@ -171,7 +173,8 @@
 			return $result;
 		}
 
-		function displaySettingsPanel(&$wrapper, $errors=NULL) {
+		public function displaySettingsPanel(XMLElement &$wrapper, $errors = null)
+        {
 			parent::displaySettingsPanel($wrapper, $errors);
 
 			// get current section id
@@ -242,7 +245,7 @@
 			$wrapper->appendChild($column);
 		}
 
-		function checkFields(&$errors, $checkForDuplicates=true) {
+		function checkFields(array &$errors, $checkForDuplicates = true) {
 			// check for presence of upload fields
 			$section_id = Administration::instance()->Page->_context[1];
 			$fields = FieldManager::fetch(NULL, $section_id, 'ASC', 'sortorder', NULL, NULL, sprintf("AND (type IN ('%s'))", implode("', '", $this->supported_upload_fields)));
@@ -325,14 +328,14 @@
 			");
 		}
 
-		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL, $entry_id) {
+		function displayPublishPanel(XMLElement &$wrapper, $data = NULL, $flagWithError = NULL, $fieldnamePrefix = NULL, $fieldnamePostfix = NULL, $entry_id = NULL) {
 
 			// append assets
 			$assets_path = '/extensions/imagecropper/assets/';
 			Administration::instance()->Page->addStylesheetToHead(URL . $assets_path . 'jquery.Jcrop.min.css', 'screen', 120, false);
 			Administration::instance()->Page->addStylesheetToHead(URL . $assets_path . 'jquery-ui-1.8.20.custom.css', 'screen', 130, false);
 			Administration::instance()->Page->addStylesheetToHead(URL . $assets_path . 'imagecropper.publish.css', 'screen', 140, false);
-			Administration::instance()->Page->addScriptToHead(URL . $assets_path . 'jquery.Jcrop.min.js', 430, false);
+			Administration::instance()->Page->addScriptToHead(URL . $assets_path . 'jquery.Jcrop.js', 430, false);
 			Administration::instance()->Page->addScriptToHead(URL . $assets_path . 'jquery-ui-1.8.20.custom.min.js', 440, false);
 			Administration::instance()->Page->addScriptToHead(URL . $assets_path . 'imagecropper.publish.js', 450, false);
 
@@ -479,6 +482,7 @@
 			}
 			else {
 				$wrapper->appendChild($imagecropper);
+				
 			}
 		}
 
@@ -487,7 +491,7 @@
 				$entries = EntryManager::fetch($entry_id);
 				
 				$entryData = $entries[0]->getData();
-				$image = '<img style="vertical-align: middle;" src="' . URL . '/image/5/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/0/40'. $entryData[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
+				$image = '<img style="vertical-align: middle;" src="' . URL . '/image/quadrato-symphony/uploads/'. $entryData[$this->get('related_field_id')]['file'] .'" alt="'.$this->get('label').' of Entry '.$entry_id.'"/>';
 			} else {
 				return parent::prepareTableValue(NULL);
 			}
@@ -498,7 +502,7 @@
 			}
 
 			else{
-				$link = Widget::Anchor($image, URL . '/image/5/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/'.$data['width'].'/'.$data['height']. $entryData[$this->get('related_field_id')]['file']);
+				$link = Widget::Anchor($image, URL . '/image/6/'.$data['width'].'/'.$data['height'].'/'.$data['x1'].'/'.$data['y1'].'/'.$data['width'].'/'.$data['height'].'/uploads/'. $entryData[$this->get('related_field_id')]['file']);
 				return $link->generate();
 			}
 
@@ -510,7 +514,7 @@
 			}
 		}
 
-		public function appendFormattedElement(&$wrapper, $data, $encode = false) {
+		public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = NULL, $entry_id = NULL) {
 			
 			if ($data['cropped'] == 'yes') {
 				$imagecropper = new XMLElement($this->get('element_name'));
